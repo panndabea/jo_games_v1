@@ -10,6 +10,7 @@
   const GRAVITY = 2400;
   const WORLD_HEIGHT = HEIGHT;
   const LEVEL_WIDTH = 3600;
+  const MAX_DELTA_TIME = 0.033;
 
   const keys = new Set();
 
@@ -674,7 +675,7 @@
     if (!game.lastTime) game.lastTime = ts;
     const rawDt = (ts - game.lastTime) / 1000;
     game.lastTime = ts;
-    const dt = Math.min(0.033, rawDt);
+    const dt = Math.min(MAX_DELTA_TIME, rawDt);
 
     update(dt);
     render();
