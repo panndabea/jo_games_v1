@@ -31,6 +31,8 @@
   const XP_GROWTH_RATE = 1.35;
   const ENEMY_XP_REWARD = 45;
   const INTRO_SCENE_DURATION = 3.5;
+  const INTRO_STAR_X_STEP = 157;
+  const INTRO_STAR_Y_STEP = 83;
   const BASE_GLOW_OFFSET = 6;
   const GLOW_PER_LEVEL = 2;
   const FLASH_GLOW_MAX = 18;
@@ -531,8 +533,8 @@
     player.vx = move * player.speed;
     if (move !== 0) player.facing = move;
 
-    player.vy += GRAVITY * dt;
     player.prevY = player.y;
+    player.vy += GRAVITY * dt;
 
     player.x += player.vx * dt;
     player.y += player.vy * dt;
@@ -594,10 +596,9 @@
         // Nur ein Treffer von oben besiegt den Gegner.
         const playerBottomPrev = player.prevY + player.h;
         const playerBottom = player.y + player.h;
-        const stompFromAbove =
-          player.vy > 0 &&
-          playerBottomPrev <= enemy.y + ENEMY_STOMP_TOLERANCE &&
-          playerBottom <= enemy.y + enemy.h * ENEMY_STOMP_HEIGHT_RATIO;
+        const wasAbove = playerBottomPrev <= enemy.y + ENEMY_STOMP_TOLERANCE;
+        const withinStompZone = playerBottom <= enemy.y + enemy.h * ENEMY_STOMP_HEIGHT_RATIO;
+        const stompFromAbove = player.vy > 0 && wasAbove && withinStompZone;
         if (stompFromAbove) {
           defeatEnemy(enemy);
         } else {
@@ -782,6 +783,7 @@
 
     const x = player.x - game.cameraX;
     const y = player.y;
+    // Farbpalette bleibt ab dem letzten Stil konstant, Glow skaliert weiter.
     const styleIndex = Math.min(playerLevel - 1, PLAYER_STYLES.length - 1);
     const style = PLAYER_STYLES[styleIndex];
     const baseGlow = playerLevel > 1 ? BASE_GLOW_OFFSET + (playerLevel - 1) * GLOW_PER_LEVEL : 0;
@@ -884,8 +886,8 @@
 
     ctx.fillStyle = "rgba(255,255,255,0.7)";
     for (let i = 0; i < 60; i++) {
-      const starX = (i * 157) % WIDTH;
-      const starY = (i * 83) % (HEIGHT * 0.6);
+      const starX = (i * INTRO_STAR_X_STEP) % WIDTH;
+      const starY = (i * INTRO_STAR_Y_STEP) % (HEIGHT * 0.6);
       ctx.fillRect(starX, starY, 2, 2);
     }
 
