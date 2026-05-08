@@ -11,6 +11,13 @@
   const WORLD_HEIGHT = HEIGHT;
   const LEVEL_WIDTH = 3600;
   const MAX_DELTA_TIME = 0.033;
+  const PLATFORM_COLLISION_TOLERANCE = 4;
+  const PLAYER_CENTER_RATIO = 0.5;
+  const SIDE_COLLISION_MARGIN = 6;
+  const HEAD_BUMP_VELOCITY = 120;
+  const HILL_PARALLAX_SPEED_NEAR = 0.35;
+  const HILL_PARALLAX_SPEED_FAR = 0.2;
+  const CLOUD_PARALLAX_SPEED = 0.45;
 
   const keys = new Set();
 
@@ -295,17 +302,17 @@
       if (!overlaps(player, p)) continue;
 
       const prevBottom = prevY + player.h;
-      if (prevBottom <= p.y + 4 && player.vy >= 0) {
+      if (prevBottom <= p.y + PLATFORM_COLLISION_TOLERANCE && player.vy >= 0) {
         player.y = p.y - player.h;
         player.vy = 0;
         player.onGround = true;
-      } else if (player.x + player.w * 0.5 < p.x + 6) {
+      } else if (player.x + player.w * PLAYER_CENTER_RATIO < p.x + SIDE_COLLISION_MARGIN) {
         player.x = p.x - player.w;
-      } else if (player.x + player.w * 0.5 > p.x + p.w - 6) {
+      } else if (player.x + player.w * PLAYER_CENTER_RATIO > p.x + p.w - SIDE_COLLISION_MARGIN) {
         player.x = p.x + p.w;
       } else if (player.vy < 0) {
         player.y = p.y + p.h;
-        player.vy = 120;
+        player.vy = HEAD_BUMP_VELOCITY;
       }
     }
 
@@ -391,8 +398,8 @@
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
     // Parallax: distant hills move slower than the foreground.
-    const hillOffset1 = (game.cameraX * 0.2) % WIDTH;
-    const hillOffset2 = (game.cameraX * 0.35) % WIDTH;
+    const hillOffset1 = (game.cameraX * HILL_PARALLAX_SPEED_FAR) % WIDTH;
+    const hillOffset2 = (game.cameraX * HILL_PARALLAX_SPEED_NEAR) % WIDTH;
 
     ctx.fillStyle = "#8ecf9f";
     for (let i = -1; i < 3; i++) {
@@ -415,7 +422,7 @@
     }
 
     for (const cloud of level.clouds) {
-      const cx = cloud.x - game.cameraX * 0.45;
+      const cx = cloud.x - game.cameraX * CLOUD_PARALLAX_SPEED;
       drawCloud(cx, cloud.y, cloud.s);
     }
   }
