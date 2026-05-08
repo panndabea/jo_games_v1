@@ -97,7 +97,7 @@
     ],
   };
 
-  // Web Audio API: zentrale Knoten, einfache SFX und loopende Retro-Musik.
+  // Web Audio API: central nodes, simple SFX and looping retro music.
   let audioCtx;
   let masterGain;
   let musicGain;
@@ -389,7 +389,7 @@
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-    // Parallax: ferne Hügel bewegen sich langsamer als Vordergrund.
+    // Parallax: distant hills move slower than the foreground.
     const hillOffset1 = (game.cameraX * 0.2) % WIDTH;
     const hillOffset2 = (game.cameraX * 0.35) % WIDTH;
 
@@ -631,7 +631,7 @@
   }
 
   function handleJumpInput() {
-    if ((game.state === "playing" || game.state === "paused") && player.onGround && game.state !== "paused") {
+    if (game.state === "playing" && player.onGround) {
       player.vy = -player.jumpForce;
       player.onGround = false;
       sfxJump();
