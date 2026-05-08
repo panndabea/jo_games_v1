@@ -9,6 +9,8 @@
   const HEIGHT = canvas.height;
   const GRAVITY = 2400;
   const WORLD_HEIGHT = HEIGHT;
+  const BASE_PLAYER_SPEED = 280;
+  const BASE_PLAYER_JUMP_FORCE = 860;
   const DEFAULT_LEVEL_WIDTH = 3600;
   const MAX_DELTA_TIME = 0.033;
   const PLATFORM_COLLISION_TOLERANCE = 4;
@@ -17,6 +19,11 @@
   const HEAD_BUMP_VELOCITY = 120;
   const ENEMY_BOUNCE_VELOCITY = 520;
   const ENEMY_STOMP_TOLERANCE = 10;
+  const ENEMY_STOMP_HEIGHT_RATIO = 0.4;
+  const SPEED_PER_LEVEL = 22;
+  const JUMP_FORCE_PER_LEVEL = 40;
+  const BASE_MAX_LIVES = 3;
+  const LIVES_LEVEL_INTERVAL = 2;
   const HILL_PARALLAX_SPEED_NEAR = 0.35;
   const HILL_PARALLAX_SPEED_FAR = 0.2;
   const CLOUD_PARALLAX_SPEED = 0.45;
@@ -24,6 +31,10 @@
   const XP_GROWTH_RATE = 1.35;
   const ENEMY_XP_REWARD = 45;
   const INTRO_SCENE_DURATION = 3.5;
+  const BASE_GLOW_OFFSET = 6;
+  const GLOW_PER_LEVEL = 2;
+  const FLASH_GLOW_MAX = 18;
+  const LEVEL_UP_FLASH_DURATION = 0.6;
 
   const keys = new Set();
 
@@ -44,11 +55,11 @@
     h: 40,
     vx: 0,
     vy: 0,
-    speed: 280,
-    jumpForce: 860,
-    baseSpeed: 280,
-    baseJumpForce: 860,
-    maxLives: 3,
+    speed: BASE_PLAYER_SPEED,
+    jumpForce: BASE_PLAYER_JUMP_FORCE,
+    baseSpeed: BASE_PLAYER_SPEED,
+    baseJumpForce: BASE_PLAYER_JUMP_FORCE,
+    maxLives: BASE_MAX_LIVES,
     onGround: false,
     facing: 1,
     animTime: 0,
@@ -452,9 +463,9 @@
   }
 
   function applyLevelBonuses() {
-    player.speed = player.baseSpeed + (playerLevel - 1) * 22;
-    player.jumpForce = player.baseJumpForce + (playerLevel - 1) * 40;
-    player.maxLives = 3 + Math.floor((playerLevel - 1) / 2);
+    player.speed = player.baseSpeed + (playerLevel - 1) * SPEED_PER_LEVEL;
+    player.jumpForce = player.baseJumpForce + (playerLevel - 1) * JUMP_FORCE_PER_LEVEL;
+    player.maxLives = BASE_MAX_LIVES + Math.floor((playerLevel - 1) / LIVES_LEVEL_INTERVAL);
   }
 
   // XP-System: XP sammeln und Level-Up auslösen.
@@ -470,7 +481,7 @@
     playerLevel += 1;
     xpToNextLevel = Math.ceil(xpToNextLevel * XP_GROWTH_RATE);
     applyLevelBonuses();
-    player.levelUpFlash = 0.6;
+    player.levelUpFlash = LEVEL_UP_FLASH_DURATION;
     game.lives = Math.min(player.maxLives, game.lives + 1);
   }
 
@@ -586,7 +597,7 @@
         const stompFromAbove =
           player.vy > 0 &&
           playerBottomPrev <= enemy.y + ENEMY_STOMP_TOLERANCE &&
-          playerBottom <= enemy.y + enemy.h * 0.4;
+          playerBottom <= enemy.y + enemy.h * ENEMY_STOMP_HEIGHT_RATIO;
         if (stompFromAbove) {
           defeatEnemy(enemy);
         } else {
@@ -773,8 +784,9 @@
     const y = player.y;
     const styleIndex = Math.min(playerLevel - 1, PLAYER_STYLES.length - 1);
     const style = PLAYER_STYLES[styleIndex];
-    const baseGlow = playerLevel > 1 ? 6 + (playerLevel - 1) * 2 : 0;
-    const flashGlow = player.levelUpFlash > 0 ? 18 * (player.levelUpFlash / 0.6) : 0;
+    const baseGlow = playerLevel > 1 ? BASE_GLOW_OFFSET + (playerLevel - 1) * GLOW_PER_LEVEL : 0;
+    const flashGlow =
+      player.levelUpFlash > 0 ? FLASH_GLOW_MAX * (player.levelUpFlash / LEVEL_UP_FLASH_DURATION) : 0;
 
     const stride = player.onGround ? Math.sin(player.animTime * 18) * 3 : 0;
     ctx.save();
