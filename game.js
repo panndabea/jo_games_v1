@@ -23,7 +23,7 @@
   const BASE_XP_TO_NEXT = 140;
   const XP_GROWTH_RATE = 1.35;
   const ENEMY_XP_REWARD = 45;
-  const INTRO_SCENE_DURATION = 4.5;
+  const INTRO_SCENE_DURATION = 3.5;
 
   const keys = new Set();
 
@@ -586,7 +586,7 @@
         const stompFromAbove =
           player.vy > 0 &&
           playerBottomPrev <= enemy.y + ENEMY_STOMP_TOLERANCE &&
-          playerBottom <= enemy.y + enemy.h * 0.6;
+          playerBottom <= enemy.y + enemy.h * 0.4;
         if (stompFromAbove) {
           defeatEnemy(enemy);
         } else {
