@@ -468,7 +468,7 @@
 
   function levelUp() {
     playerLevel += 1;
-    xpToNextLevel = Math.round(xpToNextLevel * XP_GROWTH_RATE);
+    xpToNextLevel = Math.ceil(xpToNextLevel * XP_GROWTH_RATE);
     applyLevelBonuses();
     player.levelUpFlash = 0.6;
     game.lives = Math.min(player.maxLives, game.lives + 1);
@@ -771,7 +771,8 @@
 
     const x = player.x - game.cameraX;
     const y = player.y;
-    const style = PLAYER_STYLES[(playerLevel - 1) % PLAYER_STYLES.length];
+    const styleIndex = Math.min(playerLevel - 1, PLAYER_STYLES.length - 1);
+    const style = PLAYER_STYLES[styleIndex];
     const baseGlow = playerLevel > 1 ? 6 + (playerLevel - 1) * 2 : 0;
     const flashGlow = player.levelUpFlash > 0 ? 18 * (player.levelUpFlash / 0.6) : 0;
 
@@ -864,7 +865,7 @@
   // Intro-Sequenz mit einfacher Bitmap-/Pixel-Art.
   function drawIntroStory() {
     if (intro.index >= introScenes.length) return;
-    const scene = introScenes[Math.min(intro.index, introScenes.length - 1)];
+    const scene = introScenes[intro.index];
 
     ctx.fillStyle = "#0b1020";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
