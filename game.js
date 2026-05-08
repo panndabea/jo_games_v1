@@ -522,7 +522,6 @@
 
     player.vy += GRAVITY * dt;
     player.prevY = player.y;
-    const prevY = player.prevY;
 
     player.x += player.vx * dt;
     player.y += player.vy * dt;
@@ -534,7 +533,7 @@
     for (const p of level.platforms) {
       if (!overlaps(player, p)) continue;
 
-      const prevBottom = prevY + player.h;
+      const prevBottom = player.prevY + player.h;
       if (prevBottom <= p.y + PLATFORM_COLLISION_TOLERANCE && player.vy >= 0) {
         player.y = p.y - player.h;
         player.vy = 0;
@@ -583,7 +582,11 @@
       if (overlaps(player, enemy)) {
         // Nur ein Treffer von oben besiegt den Gegner.
         const playerBottomPrev = player.prevY + player.h;
-        const stompFromAbove = player.vy > 0 && playerBottomPrev <= enemy.y + ENEMY_STOMP_TOLERANCE;
+        const playerBottom = player.y + player.h;
+        const stompFromAbove =
+          player.vy > 0 &&
+          playerBottomPrev <= enemy.y + ENEMY_STOMP_TOLERANCE &&
+          playerBottom <= enemy.y + enemy.h * 0.6;
         if (stompFromAbove) {
           defeatEnemy(enemy);
         } else {
@@ -860,6 +863,7 @@
 
   // Intro-Sequenz mit einfacher Bitmap-/Pixel-Art.
   function drawIntroStory() {
+    if (intro.index >= introScenes.length) return;
     const scene = introScenes[Math.min(intro.index, introScenes.length - 1)];
 
     ctx.fillStyle = "#0b1020";
